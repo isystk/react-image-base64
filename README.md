@@ -19,7 +19,7 @@ https://isystk.github.io/react-image-base64
 # Installation
  
 ```bash
-yarn add -D heic2any
+yarn add -D react-image-base64
 ```
  
 # Usage
@@ -32,24 +32,33 @@ yarn run start
  
 # Note
 
-利用例
 ```
-  const [imageBase64, setImageBase64] = useState(undefined);
+  const [images, setImages] = useState({data: []});
+  const [errors, setErrors] = useState([]);
 
   return (
     <div>
       <ReactImageBase64
+        maxFileSize={10485760}
+        thumbnail_size={100}
+        drop={true}
+        dropText="ファイルをドラッグ＆ドロップもしくは"
+        capture="environment"
+        multiple={true}
         handleChange={data => {
-          console.log(data)
-          setImageBase64(data.imageBase64);
+          if (data.result) {
+            let list =images.data
+            list.push(data);
+            setImages({data: list})
+          } else {
+            setErrors([...errors, data.messages]);
+          }
         }}
       />
-      <div id="result">
-        {imageBase64 &&
-          (() => {
-            return <img src={imageBase64} width="200px" />
-          })()}
-      </div>
+      { errors.map((error, index) => 
+          <p className="error-message" key={index}>{error}</p>
+        )
+      }
     </div>
   )
 ```
