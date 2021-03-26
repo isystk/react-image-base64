@@ -1,31 +1,60 @@
 import React from "react";
 import heic2any from "heic2any";
 
-const ReactImageBase64 = (props: { handleChange: (arg0: { result: boolean; errors?: string[]; fileName?: string; imageBase64?: string; }) => void; }) => {
+interface IProps {
+  id?: string,
+  accept?: string,
+  capture?: string,
+  multiple?: boolean,
+  handleChange: (arg0: IReturn) => void; 
+  maxFileSize: number;
+  thumbnail_size: number;
+}
+
+const initialize = {
+  id: "js-image-base64",
+  accept: "image/*",
+  capture: undefined,
+  multiple: false,
+  handleChange: () => {},
+  maxFileSize: 10485760, // アップロード可能な最大ファイルサイズ 10BM
+  thumbnail_size: 500 // 画像リサイズ後の縦横の最大値
+}
+
+interface IReturn {
+  result: boolean,
+  messages: string[],
+  fileName?: string,
+  ofileData?: string,
+  fileData?: string,
+  ofileSize?: number,
+  fileSize?: number,
+  fileType?: string,
+}
+
+const ReactImageBase64 = (props: IProps) => {
+
+  props = {...initialize, ...props}
 
   const handleFileChange = (e: { target: { files: any; }; }) => {
-    const maxFileSize = 10485760 // アップロード可能な最大ファイルサイズ 10BM
-    const thumbnail_width = 500 // 画像リサイズ後の横の長さの最大値
-    const thumbnail_height = 500 // 画像リサイズ後の縦の長さの最大値
 
     // 入力チェック
     const validate = (blob: Blob) => {
       const errors: string[] = []
       // ファイルサイズチェック
-      if (maxFileSize < blob.size) {
-        errors.push('画像ファイルのファイルサイズが最大値(' + Math.floor(maxFileSize / 1000000) + 'MB)を超えています。')
+      if (props.maxFileSize < blob.size) {
+        errors.push('画像ファイルのファイルサイズが最大値(' + Math.floor(props.maxFileSize / 1000000) + 'MB)を超えています。')
       }
       return errors
     }
 
     const errorCallback = (values: string[]) => {
-      props.handleChange({ result: false, errors: values })
+      props.handleChange({ result: false, messages: values })
     }
 
-    const successCallback = (values: { fileName: string; fileData: string; }) => {
-      props.handleChange({ result: true, 
-        fileName: values.fileName,
-        imageBase64: values.fileData,
+    const successCallback = (values: IReturn) => {
+      props.handleChange({ 
+        ...values
       })
     }
 
@@ -40,13 +69,13 @@ const ReactImageBase64 = (props: { handleChange: (arg0: { result: boolean; error
           if (image.width > image.height) {
             // 横長の画像は横のサイズを指定値にあわせる
             const ratio = image.height / image.width
-            width = thumbnail_width
-            height = thumbnail_width * ratio
+            width = props.thumbnail_size
+            height = props.thumbnail_size * ratio
           } else {
             // 縦長の画像は縦のサイズを指定値にあわせる
             const ratio = image.width / image.height
-            width = thumbnail_height * ratio
-            height = thumbnail_height
+            width = props.thumbnail_size * ratio
+            height = props.thumbnail_size
           }
           // サムネ描画用canvasのサイズを上で算出した値に変更
           const canvas = document.createElement('canvas')
@@ -119,7 +148,11 @@ const ReactImageBase64 = (props: { handleChange: (arg0: { result: boolean; error
               resultBlob,
               function(res: { fileName: string; fileData: string; }) {
                 res.fileName = file.name
-                successCallback(res)
+                successCallback({
+                  ...res,
+                  result: true, 
+                  messages: ['正常終了'],
+                })
               },
               function(errors: string[]) {
                 errorCallback(errors)
@@ -137,7 +170,11 @@ const ReactImageBase64 = (props: { handleChange: (arg0: { result: boolean; error
           file.name,
           file,
           function(res: { fileName: string; fileData: string; }) {
-            successCallback(res)
+            successCallback({
+              ...res,
+              result: true, 
+              messages: ['正常終了'],
+            })
           },
           function(errors: string[]) {
             errorCallback(errors)
@@ -152,10 +189,10 @@ const ReactImageBase64 = (props: { handleChange: (arg0: { result: boolean; error
     <div>
       <input
         type="file"
-        id="js-uploadImage"
-        // multiple="multiple"
-        accept="image/*"
-        capture="environment"
+        id={props.id}
+        accept={props.accept}
+        capture={props.capture}
+        multiple={props.multiple}
         onChange={handleFileChange}
       />
     </div>
