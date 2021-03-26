@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FC } from "react";
 import heic2any from "heic2any";
 
 interface IProps {
@@ -9,6 +9,8 @@ interface IProps {
   handleChange: (arg0: IReturn) => void; 
   maxFileSize: number;
   thumbnail_size: number;
+  drop: boolean;
+  dropText: string;
 }
 
 const initialize = {
@@ -18,7 +20,9 @@ const initialize = {
   multiple: false,
   handleChange: () => {},
   maxFileSize: 10485760, // アップロード可能な最大ファイルサイズ 10BM
-  thumbnail_size: 500 // 画像リサイズ後の縦横の最大値
+  thumbnail_size: 500, // 画像リサイズ後の縦横の最大値
+  drop: false,
+  dropText: 'image drop here !!'
 }
 
 interface IReturn {
@@ -32,10 +36,12 @@ interface IReturn {
   fileType?: string,
 }
 
-const ReactImageBase64 = (props: IProps) => {
+const ReactImageBase64: FC<IProps> = (props) => {
 
+  // 初期値を設定
   props = {...initialize, ...props}
 
+  // ファイル選択時のハンドラー
   const handleFileChange = (e: { target: { files: any; }; }) => {
 
     // 入力チェック
@@ -59,7 +65,7 @@ const ReactImageBase64 = (props: IProps) => {
     }
 
     // 画像のリサイズ
-    const resize = function(fileName:string, blob: Blob, callback: { (res: any): void; (res: any): void; (arg0: { fileName: any; ofileData: string | ArrayBuffer | null; fileData: string; ofileSize: any; fileSize: number; fileType: string; }): void; }, errorCallback: { (errors: any): void; (errors: any): void; (arg0: string[]): void; }) {
+    const resize = function(fileName:string, blob: Blob, callback: any, errorCallback: any) {
       const image = new Image()
       const fr = new FileReader()
       fr.onload = function(evt) {
@@ -185,18 +191,68 @@ const ReactImageBase64 = (props: IProps) => {
     }
   }
 
-  return (
-    <div>
-      <input
-        type="file"
-        id={props.id}
-        accept={props.accept}
-        capture={props.capture}
-        multiple={props.multiple}
-        onChange={handleFileChange}
-      />
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    var files = e.dataTransfer.files;
+    if (files.length === 0) {
+      return;
+    }
+    handleFileChange({target: {files}})
+  };
+
+  const DropZone: FC<{dropText: string}> = ({children, dropText}) => (
+    <div id="drop-zone" 
+      onDrop={e => handleDrop(e)}
+      onDragOver={e => handleDragOver(e)}
+      onDragEnter={e => handleDragEnter(e)}
+      onDragLeave={e => handleDragLeave(e)}
+    >
+      <p>{dropText}</p>
+      {children}
     </div>
-  );
+  )
+
+  return (
+    (() => {
+      return props.drop ?
+      (
+      <DropZone dropText={props.dropText}>
+        <input
+          type="file"
+          id={props.id}
+          accept={props.accept}
+          capture={props.capture}
+          multiple={props.multiple}
+          onChange={handleFileChange}
+        />
+      </DropZone>
+      )
+      :
+      (
+        <input
+          type="file"
+          id={props.id}
+          accept={props.accept}
+          capture={props.capture}
+          multiple={props.multiple}
+          onChange={handleFileChange}
+        />
+      )
+    })()
+  )
 };
 
 export default ReactImageBase64;

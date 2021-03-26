@@ -651,3 +651,13 @@ table.listTable td.btn input {
   max-width: 100%;
   max-height: 120px;
 }
+
+.error-message {
+  color: red;
+  margin-top: 20px;
+}
+
+#drop-zone {
+  border: 1px solid;
+  padding: 30px;
+}

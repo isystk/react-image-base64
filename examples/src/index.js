@@ -6,7 +6,7 @@ import ReactImageBase64 from '../../dist';
 import './style.css';
 
 const App = () => {
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState({data: []});
   const [errors, setErrors] = useState([]);
 
   return (
@@ -27,30 +27,27 @@ const App = () => {
             </div>
             <div className="entry-content">
               <h2>デモ</h2>
-
-              <div id="drop-zone" style={{border: "1px solid", padding: "30px"}}>
-                <p>ファイルをドラッグ＆ドロップもしくは</p>
-                <ReactImageBase64
-                  capture="environment"
-                  multiple={true}
-                  handleChange={data => {
-                    if (data.result) {
-                      setImages([...images, data])
-                    } else {
-                      setErrors(data.errors);
-                    }
-                  }}
-                />
-                {
-                  (() => {
-                    for (error of errors) {
-                      return <p className="error-message">{error}</p>
-                    }
+              <ReactImageBase64
+                maxFileSize={10485760}
+                thumbnail_size={100}
+                drop={true}
+                dropText="ファイルをドラッグ＆ドロップもしくは"
+                capture="environment"
+                multiple={true}
+                handleChange={data => {
+                  if (data.result) {
+                    let list =images.data
+                    list.push(data);
+                    setImages({data: list})
+                  } else {
+                    setErrors([...errors, data.messages]);
                   }
-                  )()
-                }
-              </div>
-
+                }}
+              />
+              { errors.map((error, index) => 
+                  <p className="error-message" key={index}>{error}</p>
+                )
+              }
               <div>
                 <table id="select-image">
                   <thead>
@@ -64,7 +61,7 @@ const App = () => {
                     </tr>
                   </thead>
                   <tbody>
-                  { images.map((image, index) => (
+                  { images.data.map((image, index) => (
                     <tr key={index}>
                       <td>{image.fileName}</td>
                       <td><img src={image.ofileData} /></td>
