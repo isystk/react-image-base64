@@ -1,6 +1,6 @@
 {
   "name": "react-image-base64",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "画像ファイルをBase64に変換するReact用コンポーネントです",
   "scripts": {
     "build": "tsc",
