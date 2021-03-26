@@ -22,6 +22,10 @@ module.exports = {
             }
         ]
     },
+    output: {
+        path: path.join(__dirname, "examples/dist"),
+        filename: "bundle.js"
+    },
     plugins: [htmlWebpackPlugin],
     resolve: {
         extensions: ['.js', '.jsx']
