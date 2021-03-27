@@ -36,7 +36,10 @@ type Return = {
   fileType?: string,
 }
 
-const ReactImageBase64: FC<Props> = (props = {...initialize}) => {
+const ReactImageBase64: FC<Props> = (props) => {
+
+  // 初期値を設定
+  props = {...initialize, ...props}
 
   // ファイル選択時のハンドラー
   const handleFileChange = (e: { target: { files: any; }; }) => {

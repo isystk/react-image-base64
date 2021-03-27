@@ -16,7 +16,10 @@ const initialize = {
     drop: false,
     dropText: 'image drop here !!'
 };
-const ReactImageBase64 = (props = Object.assign({}, initialize)) => {
+const ReactImageBase64 = (props) => {
+    // 初期値を設定
+    console.log(props);
+    props = Object.assign(Object.assign({}, initialize), props);
     // ファイル選択時のハンドラー
     const handleFileChange = (e) => {
         // 入力チェック
