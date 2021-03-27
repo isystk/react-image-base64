@@ -1,12 +1,12 @@
 import React, { FC } from "react";
 import heic2any from "heic2any";
 
-interface IProps {
+type Props = {
   id?: string,
   accept?: string,
   capture?: string,
   multiple?: boolean,
-  handleChange: (arg0: IReturn) => void; 
+  handleChange: (arg0: Return) => void; 
   maxFileSize: number;
   thumbnail_size: number;
   drop: boolean;
@@ -25,7 +25,7 @@ const initialize = {
   dropText: 'image drop here !!'
 }
 
-interface IReturn {
+type Return = {
   result: boolean,
   messages: string[],
   fileName?: string,
@@ -36,10 +36,7 @@ interface IReturn {
   fileType?: string,
 }
 
-const ReactImageBase64: FC<IProps> = (props) => {
-
-  // 初期値を設定
-  props = {...initialize, ...props}
+const ReactImageBase64: FC<Props> = (props = {...initialize}) => {
 
   // ファイル選択時のハンドラー
   const handleFileChange = (e: { target: { files: any; }; }) => {
@@ -58,7 +55,7 @@ const ReactImageBase64: FC<IProps> = (props) => {
       props.handleChange({ result: false, messages: values })
     }
 
-    const successCallback = (values: IReturn) => {
+    const successCallback = (values: Return) => {
       props.handleChange({ 
         ...values
       })
