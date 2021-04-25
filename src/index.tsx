@@ -6,6 +6,8 @@ type Props = {
   accept?: string,
   capture?: string,
   multiple?: boolean,
+  highlight?: boolean,
+  highlight_color?: string,
   handleChange: (arg0: Return) => void; 
   maxFileSize: number;
   thumbnail_size: number;
@@ -18,6 +20,8 @@ const initialize = {
   accept: "image/*",
   capture: undefined,
   multiple: false,
+  highlight: false,
+  highlight_color: "#e1e7ff",
   handleChange: () => {},
   maxFileSize: 10485760, // アップロード可能な最大ファイルサイズ 10BM
   thumbnail_size: 500, // 画像リサイズ後の縦横の最大値
@@ -37,6 +41,8 @@ type Return = {
 }
 
 const ReactImageBase64: FC<Props> = (props) => {
+  // Drag&Drop操作の状態を管理
+  const [isHover, setIsHover] = React.useState(false);
 
   // 初期値を設定
   props = {...initialize, ...props}
@@ -194,10 +200,12 @@ const ReactImageBase64: FC<Props> = (props) => {
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    setIsHover(true);
   };
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    setIsHover(false);
   };
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -206,6 +214,7 @@ const ReactImageBase64: FC<Props> = (props) => {
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    setIsHover(false);
     var files = e.dataTransfer.files;
     if (files.length === 0) {
       return;
@@ -215,6 +224,12 @@ const ReactImageBase64: FC<Props> = (props) => {
 
   const DropZone: FC<{dropText: string}> = ({children, dropText}) => (
     <div id="drop-zone" 
+      style={props.highlight && isHover ? {
+        background: props.highlight_color,
+        backgroundImage: 'repeating-linear-gradient(-45deg, #fff, #fff 7px, transparent 0, transparent 14px)'
+      } : {
+        background: 'none'
+      }}
       onDrop={e => handleDrop(e)}
       onDragOver={e => handleDragOver(e)}
       onDragEnter={e => handleDragEnter(e)}
