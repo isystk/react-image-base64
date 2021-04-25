@@ -10,6 +10,8 @@ const initialize = {
     accept: "image/*",
     capture: undefined,
     multiple: false,
+    highlight: false,
+    highlight_color: "#e1e7ff",
     handleChange: () => { },
     maxFileSize: 10485760,
     thumbnail_size: 500,
@@ -17,8 +19,9 @@ const initialize = {
     dropText: 'image drop here !!'
 };
 const ReactImageBase64 = (props) => {
+    // Drag&Drop操作の状態を管理
+    const [isHover, setIsHover] = react_1.default.useState(false);
     // 初期値を設定
-    console.log(props);
     props = Object.assign(Object.assign({}, initialize), props);
     // ファイル選択時のハンドラー
     const handleFileChange = (e) => {
@@ -147,10 +150,12 @@ const ReactImageBase64 = (props) => {
     const handleDragEnter = (e) => {
         e.preventDefault();
         e.stopPropagation();
+        setIsHover(true);
     };
     const handleDragLeave = (e) => {
         e.preventDefault();
         e.stopPropagation();
+        setIsHover(false);
     };
     const handleDragOver = (e) => {
         e.preventDefault();
@@ -159,13 +164,19 @@ const ReactImageBase64 = (props) => {
     const handleDrop = (e) => {
         e.preventDefault();
         e.stopPropagation();
+        setIsHover(false);
         var files = e.dataTransfer.files;
         if (files.length === 0) {
             return;
         }
         handleFileChange({ target: { files } });
     };
-    const DropZone = ({ children, dropText }) => (react_1.default.createElement("div", { id: "drop-zone", onDrop: e => handleDrop(e), onDragOver: e => handleDragOver(e), onDragEnter: e => handleDragEnter(e), onDragLeave: e => handleDragLeave(e) },
+    const DropZone = ({ children, dropText }) => (react_1.default.createElement("div", { id: "drop-zone", style: props.highlight && isHover ? {
+            background: props.highlight_color,
+            backgroundImage: 'repeating-linear-gradient(-45deg, #fff, #fff 7px, transparent 0, transparent 14px)'
+        } : {
+            background: 'none'
+        }, onDrop: e => handleDrop(e), onDragOver: e => handleDragOver(e), onDragEnter: e => handleDragEnter(e), onDragLeave: e => handleDragLeave(e) },
         react_1.default.createElement("p", null, dropText),
         children));
     return ((() => {

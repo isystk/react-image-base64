@@ -32,6 +32,8 @@ const App = () => {
                 thumbnail_size={100}
                 drop={true}
                 dropText="ファイルをドラッグ＆ドロップもしくは"
+                highlight={true}
+                highlight_color="#6666ff"
                 capture="environment"
                 multiple={true}
                 handleChange={data => {
