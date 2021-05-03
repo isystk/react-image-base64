@@ -11,6 +11,7 @@ https://isystk.github.io/react-image-base64
 - ファイルを選択するとBase64に変換されたデータをJSON形式で返却します。
 - 画像のサイズを指定することでリサイズすることが可能です。
 - HEIC形式の画像の場合はJPEGに変換します。
+- ドラッグ＆ドロップでアップロードファイルの選択が可能です。
  
 # Requirement
  
