@@ -1,9 +1,28 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const react_1 = __importDefault(require("react"));
+const react_1 = __importStar(require("react"));
 const heic2any_1 = __importDefault(require("heic2any"));
 const initialize = {
     id: "js-image-base64",
@@ -19,6 +38,8 @@ const initialize = {
 const ReactImageBase64 = (props) => {
     // 初期値を設定
     props = Object.assign(Object.assign({}, initialize), props);
+    // Drag&Drop操作の状態を管理
+    const [isHover, setIsHover] = react_1.useState(false);
     // ファイル選択時のハンドラー
     const handleFileChange = (e) => {
         // 入力チェック
@@ -146,10 +167,12 @@ const ReactImageBase64 = (props) => {
     const handleDragEnter = (e) => {
         e.preventDefault();
         e.stopPropagation();
+        setIsHover(true);
     };
     const handleDragLeave = (e) => {
         e.preventDefault();
         e.stopPropagation();
+        setIsHover(false);
     };
     const handleDragOver = (e) => {
         e.preventDefault();
@@ -158,13 +181,15 @@ const ReactImageBase64 = (props) => {
     const handleDrop = (e) => {
         e.preventDefault();
         e.stopPropagation();
+        setIsHover(false);
         var files = e.dataTransfer.files;
         if (files.length === 0) {
             return;
         }
         handleFileChange({ target: { files } });
     };
-    const DropZone = ({ children, dropText }) => (react_1.default.createElement("div", { id: "drop-zone", onDrop: e => handleDrop(e), onDragOver: e => handleDragOver(e), onDragEnter: e => handleDragEnter(e), onDragLeave: e => handleDragLeave(e) },
+    console.log("isHover", isHover);
+    const DropZone = ({ children, dropText }) => (react_1.default.createElement("div", { id: "drop-zone", className: isHover ? 'hover' : '', onDrop: e => handleDrop(e), onDragOver: e => handleDragOver(e), onDragEnter: e => handleDragEnter(e), onDragLeave: e => handleDragLeave(e) },
         react_1.default.createElement("p", null, dropText),
         children));
     return ((() => {

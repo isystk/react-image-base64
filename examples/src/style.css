@@ -661,3 +661,7 @@ table.listTable td.btn input {
   border: 1px solid;
   padding: 30px;
 }
+#drop-zone.hover {
+  background: #6666ff;
+  background-image: repeating-linear-gradient(-45deg, #fff, #fff 7px, transparent 0, transparent 14px);
+}
