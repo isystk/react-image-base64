@@ -28,7 +28,8 @@ yarn add -D react-image-base64
 ```bash
 git clone https://github.com/isystk/react-image-base64.git
 cd react-image-base64
-yarn run start
+yarn
+yarn start
 ```
  
 # Note

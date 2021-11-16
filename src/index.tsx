@@ -1,12 +1,11 @@
 import React, { FC, useState } from "react";
-import heic2any from "heic2any";
 
 type Props = {
   id?: string,
   accept?: string,
   capture?: string,
   multiple?: boolean,
-  handleChange: (arg0: Return) => void; 
+  handleChange: (arg0: Return) => void;
   maxFileSize: number;
   thumbnail_size: number;
   drop: boolean;
@@ -36,14 +35,14 @@ type Return = {
   fileType?: string,
 }
 
-const ReactImageBase64: FC<Props> = (props) => {
+const ImageFile: FC<Props> = (props) => {
 
   // 初期値を設定
   props = {...initialize, ...props}
 
   // Drag&Drop操作の状態を管理
   const [isHover, setIsHover] = useState(false);
-  
+
   // ファイル選択時のハンドラー
   const handleFileChange = (e: { target: { files: any; }; }) => {
 
@@ -62,7 +61,7 @@ const ReactImageBase64: FC<Props> = (props) => {
     }
 
     const successCallback = (values: Return) => {
-      props.handleChange({ 
+      props.handleChange({
         ...values
       })
     }
@@ -139,13 +138,16 @@ const ReactImageBase64: FC<Props> = (props) => {
       if (ext === 'heic') {
         // HEIC対応 iphone11 以降で撮影された画像にも対応する
         // console.log('HEIC形式の画像なのでJPEGに変換します。')
-
-        heic2any({
-            blob: file,
+        const heic2any = require('heic2any')
+        if (typeof window !== 'undefined') {
+          fetch('https://alexcorvi.github.io/heic2any/demo/14.heic')
+          .then((res) => res.blob())
+          .then((blob) => heic2any({
+            blob,
             toType: 'image/jpeg',
             quality: 1,
           })
-          .then(function(rb) {
+          .then(function(rb: any) {
             const resultBlob = rb as Blob;
             const errors = validate(resultBlob)
             if (0 < errors.length) {
@@ -153,22 +155,24 @@ const ReactImageBase64: FC<Props> = (props) => {
               return
             }
             resize(
-              file.name,
-              resultBlob,
-              function(res: { fileName: string; fileData: string; }) {
-                res.fileName = file.name
-                successCallback({
-                  ...res,
-                  result: true, 
-                  messages: ['正常終了'],
-                })
-              },
-              function(errors: string[]) {
-                errorCallback(errors)
-                return
-              },
+                file.name,
+                resultBlob,
+                function(res: { fileName: string; fileData: string; }) {
+                  res.fileName = file.name
+                  successCallback({
+                    ...res,
+                    result: true,
+                    messages: ['正常終了'],
+                  })
+                },
+                function(errors: string[]) {
+                  errorCallback(errors)
+                  return
+                },
             )
-          })
+          }))
+        }
+
       } else {
         const errors = validate(file)
         if (0 < errors.length) {
@@ -176,19 +180,19 @@ const ReactImageBase64: FC<Props> = (props) => {
           return
         }
         resize(
-          file.name,
-          file,
-          function(res: { fileName: string; fileData: string; }) {
-            successCallback({
-              ...res,
-              result: true, 
-              messages: ['正常終了'],
-            })
-          },
-          function(errors: string[]) {
-            errorCallback(errors)
-            return
-          },
+            file.name,
+            file,
+            function(res: { fileName: string; fileData: string; }) {
+              successCallback({
+                ...res,
+                result: true,
+                messages: ['正常終了'],
+              })
+            },
+            function(errors: string[]) {
+              errorCallback(errors)
+              return
+            },
         )
       }
     }
@@ -218,48 +222,47 @@ const ReactImageBase64: FC<Props> = (props) => {
     }
     handleFileChange({target: {files}})
   };
-console.log("isHover", isHover);
   const DropZone: FC<{dropText: string}> = ({children, dropText}) => (
-    <div id="drop-zone" 
-      className={isHover ? 'hover': ''}
-      onDrop={e => handleDrop(e)}
-      onDragOver={e => handleDragOver(e)}
-      onDragEnter={e => handleDragEnter(e)}
-      onDragLeave={e => handleDragLeave(e)}
-    >
-      <p>{dropText}</p>
-      {children}
-    </div>
+      <div id="drop-zone"
+           className={isHover ? 'hover': ''}
+           onDrop={e => handleDrop(e)}
+           onDragOver={e => handleDragOver(e)}
+           onDragEnter={e => handleDragEnter(e)}
+           onDragLeave={e => handleDragLeave(e)}
+      >
+        <p>{dropText}</p>
+        {children}
+      </div>
   )
 
   return (
-    (() => {
-      return props.drop ?
-      (
-      <DropZone dropText={props.dropText}>
-        <input
-          type="file"
-          id={props.id}
-          accept={props.accept}
-          capture={props.capture}
-          multiple={props.multiple}
-          onChange={handleFileChange}
-        />
-      </DropZone>
-      )
-      :
-      (
-        <input
-          type="file"
-          id={props.id}
-          accept={props.accept}
-          capture={props.capture}
-          multiple={props.multiple}
-          onChange={handleFileChange}
-        />
-      )
-    })()
+      (() => {
+        return props.drop ?
+            (
+                <DropZone dropText={props.dropText}>
+                  <input
+                      type="file"
+                      id={props.id}
+                      accept={props.accept}
+                      capture={props.capture}
+                      multiple={props.multiple}
+                      onChange={handleFileChange}
+                  />
+                </DropZone>
+            )
+            :
+            (
+                <input
+                    type="file"
+                    id={props.id}
+                    accept={props.accept}
+                    capture={props.capture}
+                    multiple={props.multiple}
+                    onChange={handleFileChange}
+                />
+            )
+      })()
   )
 };
 
-export default ReactImageBase64;
+export default ImageFile;

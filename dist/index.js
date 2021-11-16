@@ -18,12 +18,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const react_1 = __importStar(require("react"));
-const heic2any_1 = __importDefault(require("heic2any"));
 const initialize = {
     id: "js-image-base64",
     accept: "image/*",
@@ -35,7 +31,7 @@ const initialize = {
     drop: false,
     dropText: 'image drop here !!'
 };
-const ReactImageBase64 = (props) => {
+const ImageFile = (props) => {
     // 初期値を設定
     props = Object.assign(Object.assign({}, initialize), props);
     // Drag&Drop操作の状態を管理
@@ -128,26 +124,31 @@ const ReactImageBase64 = (props) => {
             if (ext === 'heic') {
                 // HEIC対応 iphone11 以降で撮影された画像にも対応する
                 // console.log('HEIC形式の画像なのでJPEGに変換します。')
-                heic2any_1.default({
-                    blob: file,
-                    toType: 'image/jpeg',
-                    quality: 1,
-                })
-                    .then(function (rb) {
-                    const resultBlob = rb;
-                    const errors = validate(resultBlob);
-                    if (0 < errors.length) {
-                        errorCallback(errors);
-                        return;
-                    }
-                    resize(file.name, resultBlob, function (res) {
-                        res.fileName = file.name;
-                        successCallback(Object.assign(Object.assign({}, res), { result: true, messages: ['正常終了'] }));
-                    }, function (errors) {
-                        errorCallback(errors);
-                        return;
-                    });
-                });
+                const heic2any = require('heic2any');
+                if (typeof window !== 'undefined') {
+                    fetch('https://alexcorvi.github.io/heic2any/demo/14.heic')
+                        .then((res) => res.blob())
+                        .then((blob) => heic2any({
+                        blob,
+                        toType: 'image/jpeg',
+                        quality: 1,
+                    })
+                        .then(function (rb) {
+                        const resultBlob = rb;
+                        const errors = validate(resultBlob);
+                        if (0 < errors.length) {
+                            errorCallback(errors);
+                            return;
+                        }
+                        resize(file.name, resultBlob, function (res) {
+                            res.fileName = file.name;
+                            successCallback(Object.assign(Object.assign({}, res), { result: true, messages: ['正常終了'] }));
+                        }, function (errors) {
+                            errorCallback(errors);
+                            return;
+                        });
+                    }));
+                }
             }
             else {
                 const errors = validate(file);
@@ -188,7 +189,6 @@ const ReactImageBase64 = (props) => {
         }
         handleFileChange({ target: { files } });
     };
-    console.log("isHover", isHover);
     const DropZone = ({ children, dropText }) => (react_1.default.createElement("div", { id: "drop-zone", className: isHover ? 'hover' : '', onDrop: e => handleDrop(e), onDragOver: e => handleDragOver(e), onDragEnter: e => handleDragEnter(e), onDragLeave: e => handleDragLeave(e) },
         react_1.default.createElement("p", null, dropText),
         children));
@@ -200,4 +200,4 @@ const ReactImageBase64 = (props) => {
                 (react_1.default.createElement("input", { type: "file", id: props.id, accept: props.accept, capture: props.capture, multiple: props.multiple, onChange: handleFileChange }));
     })());
 };
-exports.default = ReactImageBase64;
+exports.default = ImageFile;
