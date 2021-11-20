@@ -1,9 +1,9 @@
 {
   "name": "react-image-base64",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "画像ファイルをBase64に変換するReact用コンポーネントです",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -d",
     "start": "npm run build && webpack serve --config ./webpack.config.js --mode development",
     "build-demo": "webpack --mode production",
     "deploy-demo": "gh-pages -d examples/dist",
